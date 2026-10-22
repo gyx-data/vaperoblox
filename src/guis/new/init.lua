@@ -164,6 +164,16 @@ do
 			friends.ColorUpdate:Fire(friendscolor.Hue, friendscolor.Sat, friendscolor.Value)
 		end
 	})
+	friends:CreateToggle({
+		Name = 'Use Roblox friends',
+		Tooltip = 'Ignore automatiquement tes amis Roblox (killaura, aura, aimbot, etc.) sans les ajouter a la liste',
+		Darker = true,
+		Default = true,
+		Function = function()
+			friends.Update:Fire() -- declenche entitylib.refresh() dans base.lua -> reevalue les cibles
+			friends.ColorUpdate:Fire(friendscolor.Hue, friendscolor.Sat, friendscolor.Value)
+		end
+	})
 	vape:Clean(friends.Update)
 	vape:Clean(friends.ColorUpdate)
 end

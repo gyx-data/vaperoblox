@@ -82,6 +82,24 @@ local function waitForChildOfType(obj, name, timeout, prop, namecheck)
 	until expireTime < os.clock()
 end
 
+-- [Amis Roblox] Cache + helper réutilisé par base.lua (isFriend) pour ignorer tes amis Roblox.
+-- entitylib.Friends[UserId] = true/false (true = ami Roblox du LocalPlayer).
+entitylib.Friends = {}
+entitylib.isFriend = function(plr)
+	if not plr then return false end
+	local uid = plr.UserId
+	if uid == nil or uid <= 0 then return false end -- guests / NPCs / userid invalide
+	local cached = entitylib.Friends[uid]
+	if cached == nil then
+		local ok, res = pcall(function()
+			return lplr.IsFriendsWith(lplr, uid)
+		end)
+		cached = (ok and res) or false
+		entitylib.Friends[uid] = cached
+	end
+	return cached
+end
+
 entitylib.targetCheck = function(entity)
 	if entity.TeamCheck then
 		return entity:TeamCheck()
@@ -356,6 +374,10 @@ entitylib.refreshEntity = function(char, plr, spawntime)
 end
 
 entitylib.addPlayer = function(plr)
+	if plr ~= lplr then
+		task.spawn(entitylib.isFriend, plr) -- pré-charge le cache d'amis
+	end
+
 	if plr.Character then
 		entitylib.refreshEntity(plr.Character, plr)
 	end

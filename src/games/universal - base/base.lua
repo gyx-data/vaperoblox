@@ -93,10 +93,20 @@ local function calculateMoveVector(vec)
 end
 
 local function isFriend(plr, recolor)
-	if vape.Categories.Friends.Options['Use friends'].Enabled then
-		local friend = table.find(vape.Categories.Friends.ListEnabled, plr.Name) and true
+	local friendsCat = vape.Categories.Friends
+	local useManual = friendsCat.Options['Use friends'].Enabled
+	local robloxOption = friendsCat.Options['Use Roblox friends']
+	local useRoblox = robloxOption and robloxOption.Enabled
+
+	if useManual or useRoblox then
+		-- Liste manuelle de pseudos
+		local friend = useManual and table.find(friendsCat.ListEnabled, plr.Name) and true or false
+		-- Amis Roblox du compte (via entitylib.isFriend, mis en cache)
+		if not friend and useRoblox then
+			friend = entitylib.isFriend(plr)
+		end
 		if recolor then
-			friend = friend and vape.Categories.Friends.Options['Recolor visuals'].Enabled
+			friend = friend and friendsCat.Options['Recolor visuals'].Enabled
 		end
 		return friend
 	end
