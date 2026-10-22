@@ -1,13 +1,15 @@
 -- Vape V4 custom : ignore automatiquement les amis Roblox
 -- Fork : https://github.com/gyx-data/vaperoblox
 --
--- Principe : on ecrit nos 3 fichiers modifies dans le cache de Vape (newvape/)
--- SANS le watermark de suppression, puis on lance le loader officiel. Le loader
--- ne retelecharge un fichier que s'il n'existe pas deja -> il utilise les notres.
--- Nos fichiers survivent aussi aux mises a jour de Vape (le wipe ne touche que
--- les fichiers portant le watermark officiel).
+-- On ecrit nos 3 fichiers modifies dans le cache de Vape (newvape/) SANS le
+-- watermark de suppression, puis on lance le loader officiel. Le loader
+-- n'ecrase pas un fichier deja present -> il utilise les notres.
+--
+-- Les fichiers sont telecharges depuis un COMMIT FIXE (pas la branche) pour
+-- eviter tout cache CDN de GitHub qui servirait une vieille version.
 
-local repo = 'https://raw.githubusercontent.com/gyx-data/vaperoblox/main/compiled/'
+local commit = 'fa81e22a5b62fc356fccd6d8334746e98303e51f'
+local repo = 'https://raw.githubusercontent.com/gyx-data/vaperoblox/' .. commit .. '/compiled/'
 
 -- destination dans le cache  ->  nom du fichier patche dans le repo
 local patched = {
@@ -27,7 +29,7 @@ for dest, name in pairs(patched) do
 		return game:HttpGet(repo .. name, true)
 	end)
 	if ok and res and res ~= '404: Not Found' then
-		writefile(dest, res)
+		writefile(dest, res) -- writefile ecrase la version eventuellement cassee en cache
 	else
 		warn('[VapeCustom] echec telechargement ' .. name .. ' : ' .. tostring(res))
 	end
